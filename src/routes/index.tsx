@@ -1,6 +1,6 @@
 import { createElement, lazy, Suspense, type ReactNode } from 'react'
 import { Flex, Spin } from 'antd'
-import { Navigate, createBrowserRouter } from 'react-router-dom'
+import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom'
 
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 
@@ -66,8 +66,24 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate replace to="/admin/dashboard" /> },
           { path: 'dashboard', element: withSuspense(createElement(adminDashboardPageLazy)) },
-          { path: 'users/new', element: withSuspense(createElement(adminAddUserPageLazy)) },
-          { path: 'users', element: withSuspense(createElement(adminUsersPageLazy)) },
+          {
+            path: 'users',
+            element: <Outlet />,
+            children: [
+              {
+                index: true,
+                element: withSuspense(createElement(adminUsersPageLazy)),
+              },
+              {
+                path: 'new',
+                element: withSuspense(createElement(adminAddUserPageLazy)),
+              },
+              {
+                path: ':rowKey/edit',
+                element: withSuspense(createElement(adminAddUserPageLazy)),
+              },
+            ],
+          },
           { path: 'settings', element: withSuspense(createElement(adminSettingsPageLazy)) },
         ],
       },

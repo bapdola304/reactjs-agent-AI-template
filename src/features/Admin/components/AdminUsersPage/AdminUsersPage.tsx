@@ -1,9 +1,15 @@
 import type { FC } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from '@ant-design/icons'
 import {
   Button,
   Card,
+  Dropdown,
   Flex,
   Input,
   Modal,
@@ -80,9 +86,12 @@ export const AdminUsersPage: FC<AdminUsersPageProps> = () => {
 
   const columnKeys = useMemo(() => collectColumnKeys(tableRows), [tableRows])
 
-  const handleEdit = useCallback(() => {
-    message.info('Edit user is not available yet.')
-  }, [])
+  const handleEdit = useCallback(
+    (record: UserTableRow) => {
+      navigate(`/admin/users/${encodeURIComponent(record.__rowKey)}/edit`)
+    },
+    [navigate],
+  )
 
   const handleDelete = useCallback(
     (record: UserTableRow) => {
@@ -139,35 +148,43 @@ export const AdminUsersPage: FC<AdminUsersPageProps> = () => {
       title: 'Actions',
       key: 'actions',
       fixed: 'right',
-      width: 148,
+      width: 56,
       align: 'center',
       render: (_: unknown, record: UserTableRow) => (
-        <Space
-          size="small"
-          className={styles.adminUsersPage__actionsCell}
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: 'edit',
+                icon: <EditOutlined />,
+                label: 'Edit',
+                onClick: () => {
+                  handleEdit(record)
+                },
+              },
+              {
+                key: 'delete',
+                icon: <DeleteOutlined />,
+                label: 'Delete',
+                danger: true,
+                onClick: () => {
+                  handleDelete(record)
+                },
+              },
+            ],
+          }}
+          trigger={['click']}
         >
           <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => {
-              handleEdit()
+            aria-label="Row actions"
+            className={styles.adminUsersPage__actionsTrigger}
+            icon={<MoreOutlined />}
+            type="text"
+            onClick={(e) => {
+              e.stopPropagation()
             }}
-          >
-            Edit
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              handleDelete(record)
-            }}
-          >
-            Delete
-          </Button>
-        </Space>
+          />
+        </Dropdown>
       ),
     }
 

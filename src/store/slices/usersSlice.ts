@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-import { addUser, deleteUserByRowKey, fetchUsers } from '@/store/thunks/usersThunks'
+import {
+  addUser,
+  deleteUserByRowKey,
+  fetchUsers,
+  updateUser,
+} from '@/store/thunks/usersThunks'
 import type { UsersState } from '@/store/types/users'
 
 const initialState: UsersState = {
@@ -40,6 +45,26 @@ export const usersSlice = createSlice({
         state.items.unshift(action.payload)
       })
       .addCase(addUser.rejected, (state) => {
+        state.isSubmitting = false
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.isSubmitting = true
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isSubmitting = false
+        const p = action.payload
+        if (p.kind === 'api') {
+          const id = p.user.id
+          state.fetchedList = state.fetchedList.map((u) =>
+            u.id === id ? p.user : u,
+          )
+        } else {
+          state.items = state.items.map((u) =>
+            u.id === p.stored.id ? p.stored : u,
+          )
+        }
+      })
+      .addCase(updateUser.rejected, (state) => {
         state.isSubmitting = false
       })
       .addCase(deleteUserByRowKey.fulfilled, (state, action) => {

@@ -1,5 +1,6 @@
-import type { AddUserPayload } from '@/store/types/users'
-import type { UserAddress, UserCompany } from '@/types/user'
+import type { AdminUserRole } from '@/features/Admin/mocks/adminUsers.mock'
+import type { AddUserPayload, StoredUser } from '@/store/types/users'
+import type { User, UserAddress, UserCompany } from '@/types/user'
 
 export interface AddUserFormValues {
   name: string
@@ -71,3 +72,44 @@ export const mapAddUserFormToPayload = (values: AddUserFormValues): AddUserPaylo
   company: normalizeCompany(values.company),
   role: values.role,
 })
+
+const DEFAULT_EDIT_ROLE: AdminUserRole = 'Viewer'
+
+type UserFieldsForForm = Pick<
+  User,
+  'name' | 'username' | 'email' | 'phone' | 'website' | 'address' | 'company'
+>
+
+/** Maps API or stored user data into the add/edit form shape. */
+export function mapUserToAddUserFormValues(
+  user: UserFieldsForForm,
+  role: AdminUserRole,
+): AddUserFormValues {
+  return {
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    phone: user.phone ?? '',
+    website: user.website ?? '',
+    address: {
+      street: user.address?.street,
+      suite: user.address?.suite,
+      city: user.address?.city,
+      zipcode: user.address?.zipcode,
+    },
+    company: {
+      name: user.company?.name,
+      catchPhrase: user.company?.catchPhrase,
+      bs: user.company?.bs,
+    },
+    role,
+  }
+}
+
+export function mapStoredUserToAddUserFormValues(user: StoredUser): AddUserFormValues {
+  return mapUserToAddUserFormValues(user, user.role)
+}
+
+export function mapApiUserToAddUserFormValues(user: User): AddUserFormValues {
+  return mapUserToAddUserFormValues(user, DEFAULT_EDIT_ROLE)
+}

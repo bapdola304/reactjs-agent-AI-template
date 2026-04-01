@@ -10,8 +10,8 @@
     line-height: 1.5;
   }
 
-  &__actionsCell {
-    white-space: nowrap;
+  &__actionsTrigger {
+    display: inline-flex;
   }
 
   /** Solid background + shadow on fixed-right column when table scrolls horizontally */

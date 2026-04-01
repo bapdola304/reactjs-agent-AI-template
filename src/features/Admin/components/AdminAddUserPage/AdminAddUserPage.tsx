@@ -1,8 +1,9 @@
 import type { FC } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Card, Col, Flex, Form, Row, Space, Typography, message } from 'antd'
+import { Card, Col, Flex, Form, Row, Space, Spin, Typography, message } from 'antd'
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { AppButton } from '@/components/AppButton/AppButton'
 import { FormSelectField } from '@/components/FormSelectField/FormSelectField'
@@ -15,7 +16,7 @@ import {
 import { formatColumnTitle } from '@/features/Admin/utils/userTableHelpers'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { selectUsersSubmitting } from '@/store/slices/usersSlice'
-import { addUser } from '@/store/thunks/usersThunks'
+import { addUser, loadUserForEdit, updateUser } from '@/store/thunks/usersThunks'
 
 import styles from './AdminAddUserPage.module.scss'
 
@@ -33,28 +34,72 @@ const roleOptions: { label: string; value: AdminUserRole }[] = [
 export const AdminAddUserPage: FC<AdminAddUserPageProps> = () => {
   const [form] = Form.useForm<AddUserFormValues>()
   const navigate = useNavigate()
+  const { rowKey: rowKeyParam } = useParams<{ rowKey: string }>()
+  const rowKey = rowKeyParam ? decodeURIComponent(rowKeyParam) : undefined
+  const isEditMode = Boolean(rowKey)
+
   const dispatch = useAppDispatch()
   const isSubmitting = useAppSelector(selectUsersSubmitting)
+  const [isLoadingUser, setIsLoadingUser] = useState(false)
 
-  const handleBackToList = () => {
+  const handleBackToList = useCallback(() => {
     navigate('/admin/users')
-  }
+  }, [navigate])
+
+  useEffect(() => {
+    if (!rowKey) {
+      return
+    }
+    let cancelled = false
+    void (async () => {
+      setIsLoadingUser(true)
+      try {
+        const res = await dispatch(loadUserForEdit(rowKey)).unwrap()
+        if (!cancelled) {
+          form.setFieldsValue(res.formValues)
+        }
+      } catch (err: unknown) {
+        if (!cancelled) {
+          message.error(
+            typeof err === 'string' ? err : 'Could not load user.',
+          )
+          navigate('/admin/users')
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingUser(false)
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [rowKey, dispatch, form, navigate])
 
   const handleFinish = async (values: AddUserFormValues) => {
     try {
       const payload = mapAddUserFormToPayload(values)
-      await dispatch(addUser(payload)).unwrap()
-      message.success(`User "${values.name}" saved.`)
-      form.resetFields()
+      if (isEditMode && rowKey) {
+        await dispatch(updateUser({ rowKey, payload })).unwrap()
+        message.success(`User "${values.name}" updated.`)
+      } else {
+        await dispatch(addUser(payload)).unwrap()
+        message.success(`User "${values.name}" saved.`)
+        form.resetFields()
+      }
       navigate('/admin/users')
     } catch (err) {
       message.error(
         typeof err === 'string'
           ? err
-          : 'Could not save user. Please try again.',
+          : isEditMode
+            ? 'Could not update user. Please try again.'
+            : 'Could not save user. Please try again.',
       )
     }
   }
+
+  const formDisabled = isSubmitting || (isEditMode && isLoadingUser)
 
   return (
     <div className={styles['admin-add-user']}>
@@ -63,39 +108,40 @@ export const AdminAddUserPage: FC<AdminAddUserPageProps> = () => {
           <AppButton
             appearance="secondary"
             aria-label="Back to users"
-            disabled={isSubmitting}
+            disabled={formDisabled}
             ghost
             icon={<ArrowLeftOutlined />}
             onClick={handleBackToList}
           />
           <Typography.Title level={4} style={{ margin: 0 }}>
-            Add user
+            {isEditMode ? 'Edit user' : 'Add user'}
           </Typography.Title>
         </div>
 
+        <div
+          className={
+            isEditMode && isLoadingUser
+              ? `${styles['admin-add-user__form-spin']} ${styles['admin-add-user__form-spin--loading']}`
+              : styles['admin-add-user__form-spin']
+          }
+        >
+          <Spin
+            delay={200}
+            size="large"
+            spinning={Boolean(isEditMode && isLoadingUser)}
+            tip="Loading user…"
+          >
         <Form<AddUserFormValues>
           className={styles['admin-add-user__form']}
-          disabled={isSubmitting}
+          disabled={formDisabled}
           form={form}
-          initialValues={{
-            name: 'Leanne Graham',
-            username: 'Bret',
-            email: 'Sincere@april.biz',
-            phone: '1-770-736-8031 x56442',
-            website: 'hildegard.org',
-            address: {
-              street: 'Kulas Light',
-              suite: 'Apt. 556',
-              city: 'Gwenborough',
-              zipcode: '92998-3874',
-            },
-            company: {
-              name: 'Romaguera-Crona',
-              catchPhrase: 'Multi-layered client-server neural-net',
-              bs: 'harness real-time e-markets',
-            },
-            role: 'Viewer',
-          }}
+          initialValues={
+            isEditMode
+              ? undefined
+              : {
+                  role: 'Viewer',
+                }
+          }
           layout="vertical"
           onFinish={handleFinish}
         >
@@ -237,17 +283,19 @@ export const AdminAddUserPage: FC<AdminAddUserPageProps> = () => {
             <Flex gap="small" justify="flex-end" wrap="wrap">
               <AppButton
                 appearance="secondary"
-                disabled={isSubmitting}
+                disabled={formDisabled}
                 onClick={handleBackToList}
               >
                 Cancel
               </AppButton>
               <AppButton appearance="primary" htmlType="submit" loading={isSubmitting}>
-                Save user
+                {isEditMode ? 'Save changes' : 'Save user'}
               </AppButton>
             </Flex>
           </Form.Item>
         </Form>
+          </Spin>
+        </div>
       </Space>
     </div>
   )
