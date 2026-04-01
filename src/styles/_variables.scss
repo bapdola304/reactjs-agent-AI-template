@@ -1,8 +1,9 @@
 // Shared design tokens — prefer these over hard-coded hex values in components.
 
 // Surfaces & borders
-$color-bg-surface: #ffffff;
-$color-border-muted: #f0f0f0;
+$color-bg-surface: var(--ant-color-bg-container);
+$color-border-muted: var(--ant-color-border-secondary);
+$color-primary: var(--ant-color-primary);
 
 // Spacing
 $space-xs: 8px;

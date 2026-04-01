@@ -1,6 +1,17 @@
 @use "@/styles/variables" as vars;
+@use "@/styles/mixins" as mix;
 
 .login-page {
+  @include mix.flex-center;
+  width: 100%;
+
+  &__theme-toggle {
+    position: absolute;
+    top: vars.$space-sm;
+    right: vars.$space-sm;
+    z-index: 1;
+  }
+
   &__card {
     width: 100%;
     max-width: vars.$login-card-max-width;
@@ -12,5 +23,9 @@
 
   &__stack {
     width: 100%;
+  }
+
+  &__form-field {
+    margin-bottom: 16px !important;
   }
 }
