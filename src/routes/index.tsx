@@ -39,6 +39,11 @@ const adminSettingsPageLazy = lazy(async () => {
   return { default: module.AdminSettingsPage }
 })
 
+const photosPageLazy = lazy(async () => {
+  const module = await import('@/features/Photos/components/PhotosPage/PhotosPage')
+  return { default: module.PhotosPage }
+})
+
 const loadingFallback = () => (
   <Flex align="center" justify="center" style={{ minHeight: '100vh' }}>
     <Spin size="large" />
@@ -85,6 +90,7 @@ export const router = createBrowserRouter([
             ],
           },
           { path: 'settings', element: withSuspense(createElement(adminSettingsPageLazy)) },
+          { path: 'photos', element: withSuspense(createElement(photosPageLazy)) },
         ],
       },
     ],

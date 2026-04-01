@@ -1,0 +1,30 @@
+@use "@/styles/variables" as vars;
+
+.photos-page {
+  &__thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__table {
+    :global(.ant-table-tbody > tr > td) {
+      vertical-align: top;
+    }
+  }
+
+  &__title-cell {
+    display: block;
+    max-width: 360px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+}
+
