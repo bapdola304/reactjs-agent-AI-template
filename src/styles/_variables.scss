@@ -1,0 +1,22 @@
+// Shared design tokens — prefer these over hard-coded hex values in components.
+
+// Surfaces & borders
+$color-bg-surface: #ffffff;
+$color-border-muted: #f0f0f0;
+
+// Spacing
+$space-xs: 8px;
+$space-sm: 16px;
+$space-md: 24px;
+
+// Layout
+$layout-header-height: 64px;
+
+// Component-specific widths (keep in sync with layout UX)
+$login-card-max-width: 420px;
+$admin-add-user-max-width: 560px;
+$admin-users-table-cell-wrap-max-width: 240px;
+
+// Form controls
+$form-control-height: 42px;
+$form-item-error-margin-top: 6px;

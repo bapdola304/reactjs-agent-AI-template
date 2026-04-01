@@ -1,0 +1,23 @@
+@use "styles/variables" as vars;
+
+.form-text-field {
+  :global(.ant-form-item-explain-error) {
+    margin-top: vars.$form-item-error-margin-top;
+    text-align: start;
+  }
+  margin-bottom: 0 !important;
+
+  &__control:global(.ant-input) {
+    height: vars.$form-control-height;
+  }
+
+  &__control:global(.ant-input-affix-wrapper) {
+    display: flex;
+    height: vars.$form-control-height;
+    align-items: center;
+
+    :global(.ant-input) {
+      height: vars.$form-control-height;
+    }
+  }
+}

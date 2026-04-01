@@ -1,0 +1,112 @@
+# GENERAL GUIDELINES FOR THE REACTJS PROJECT
+
+## 1. Language & Communication
+- Always respond in **English**.
+- Keep explanations concise and straight to the point.
+- When editing code, only show the important changed parts; do not print the entire file unless necessary.
+
+## 2. Technical Standards (Tech Stack)
+- **Framework**: React 18+ (Functional Components).
+- **Language**: TypeScript (Strict mode). Do not use `any`.
+- **UI Library**: Ant Design (v5). Prefer using Design Tokens.
+- **State Management**: Redux Toolkit (RTK).
+- **Icons**: @ant-design/icons.
+- **Styling**: Prefer SCSS Modules (`.module.scss`).
+- **Global Styles**: Shared variables live in `src/styles/_variables.scss`.
+- **Mixins**: Helper mixins live in `src/styles/_mixins.scss`.
+
+## 3. Coding Standards
+- **Component**:
+  - Use `export const ComponentName: React.FC<Props> = ...`
+  - Always define the Props interface at the top of the file.
+  - Each file should contain only one main component.
+- **Hooks**:
+  - Prefer extracting complex logic into Custom Hooks (`src/hooks`).
+  - Use `useMemo` and `useCallback` to optimize performance when passing props to child components.
+- **Ant Design Specific**:
+  - Do not use `visible`; use `open` instead (v5 standard).
+  - Use `<Space>` instead of manual margin/padding between elements.
+  - Always use `Form.useForm()` to control forms.
+
+## 4. Folder Structure
+Strictly follow this layout:
+
+- **`src/components`**: Shared, reusable UI (e.g. `AppButton`, `FormTextField`). **Each component is its own folder** named in PascalCase: `ComponentName/ComponentName.tsx` + `ComponentName.module.scss` (same base name). **Layouts** live under `src/components/layouts/<LayoutName>/` with the same pairing (e.g. `layouts/MainLayout/MainLayout.tsx` + `MainLayout.module.scss`).
+
+- **`src/features/<FeatureName>`**: Feature modules (e.g. `Auth`, `Admin`). Each feature typically includes:
+  - **`components/`** — route-level **pages** and feature-only UI. **Every page or screen component is its own folder**:
+    - `src/features/<Feature>/components/<PageName>/<PageName>.tsx`
+    - `src/features/<Feature>/components/<PageName>/<PageName>.module.scss`
+  - **`hooks/`** — feature hooks (optional).
+  - **`services/`** — feature-specific API wrappers (optional; shared HTTP clients stay in `src/services`).
+  - **`utils/`**, **`constants/`**, **`mocks/`** — as needed.
+
+- **`src/services`**: Cross-cutting API modules (`axiosInstance`, `userService`, …).
+
+- **`src/store`**: Redux store (slices, thunks, hooks).
+
+- **`src/assets`**: Images, fonts, and other static assets.
+
+- **`src/styles`**: Global SCSS (`_variables.scss`, `_mixins.scss`).
+
+**Lazy routes** must import the **tsx entry file** explicitly, e.g. `@/features/Admin/components/AdminUsersPage/AdminUsersPage` or `@/components/layouts/AdminLayout/AdminLayout`.
+
+## 5. Git & Commit Rules
+- When suggesting changes, provide a commit message following Conventional Commits (e.g., `feat: add login form with antd validation`).
+
+## 6. Import Conventions
+- **Path alias**: Always use `@/` for every import from the `src/` directory.
+- **Import order**:
+  1. External libraries (React, Antd, Redux).
+  2. Internal components/hooks (using `@/`).
+  3. Styles/assets (using `@/`).
+- **Relative paths**: Do not use relative paths `../` more than one level deep.
+
+## 7. Routing Standards
+- **Version**: Use React Router v6+.
+- **Method**: Prefer Data APIs (`createBrowserRouter`).
+- **Optimization**: Always use lazy loading for route-level components.
+- **Paths**: Always use the absolute path alias `@/` when declaring route `element` components.
+
+## 8. Performance Standards
+- **Memoization**: Use `React.memo()` for heavy pure components. Use `useMemo` for expensive calculations and `useCallback` for functions passed to memoized children.
+- **Asset Optimization**: Always lazy load images and use modern formats (WebP). Use `next/image` logic or standard lazy-loading attributes.
+- **Bundle Size**: Avoid importing entire libraries. Use named imports (e.g., `import { Button } from 'antd'`).
+- **Lists**: Always use a unique `key` (not index) for list rendering. Use Virtual Lists (from `antd` or `react-window`) for datasets > 100 items.
+
+## 9. Clean Code Guidelines
+- **DRY (Do Not Repeat Yourself)**: Extract repeated logic into utility functions or custom hooks.
+- **Function Size**: Functions should be small and do one thing (Single Responsibility Principle). Limit to 40 lines.
+- **Naming**: Use descriptive names. Boolean variables should start with `is`, `has`, or `should`.
+- **Comments**: Code should be self-documenting. Only use comments to explain "Why", not "What".
+
+## 10. Error Handling Protocols
+- **API Calls**: Wrap every API request in a `try-catch` block.
+- **User Feedback**: Errors must be communicated to the user via `message.error()` or `notification` from Ant Design.
+- **Global Catch**: Ensure there is a global `ErrorBoundary` at the top level of the application.
+- **Validation**: Use Zod or Antd Rules to catch data errors before they reach the server.
+
+## 11. SCSS & BEM Standards
+- **Naming Convention**: Use **BEM** (Block-Element-Modifier) for all class names.
+  - Block: `.card`
+  - Element: `.card__header` (use `__` for elements)
+  - Modifier: `.card--active` (use `--` for modifiers)
+- **Nesting**: Use the Sass ampersand (`&`) operator to maintain BEM structure.
+  - Example: `.card { &__header { ... } &--active { ... } }`
+- **Encapsulation**: Always use **SCSS Modules** (`.module.scss`) to avoid global scope pollution.
+- **Variables**: Never hard-code colors or spacing. Use `@use "@/styles/variables" as vars;`.
+
+## 12. API Service Standards
+- **Location**: All API-related logic must reside in `src/services/`.
+- **Instance**: Use a centralized Axios instance (e.g., `@/services/axiosInstance.ts`) with interceptors for token injection and error handling.
+- **Naming**: File names should follow the resource name (e.g., `userService.ts`, `productService.ts`).
+- **Structure**:
+  - Export a `const` object containing all methods (e.g., `export const userService = { ... }`).
+  - Use TypeScript interfaces for Request and Response payloads.
+- **Patterns**:
+  - Do not use `console.log` inside services; let the Interceptor or the Caller (Hook/Component) handle logging.
+  - Always return `response.data` or a structured object to simplify usage in Components.
+
+
+---
+*Note: If the user asks to do something that conflicts with the rules above (e.g., using JavaScript), gently remind them but still follow their request.*

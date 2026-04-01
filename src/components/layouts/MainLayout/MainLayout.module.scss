@@ -1,0 +1,12 @@
+@use "@/styles/variables" as vars;
+@use "@/styles/mixins" as mix;
+
+.main-layout {
+  min-height: 100vh;
+  padding: vars.$space-sm;
+
+  &__content {
+    min-height: calc(100vh - #{vars.$space-sm * 2});
+    @include mix.flex-center;
+  }
+}

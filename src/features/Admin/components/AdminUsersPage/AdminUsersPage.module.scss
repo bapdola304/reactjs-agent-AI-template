@@ -1,0 +1,27 @@
+@use "@/styles/variables" as vars;
+
+.adminUsersPage {
+  &__cellWrap {
+    display: block;
+    max-width: vars.$admin-users-table-cell-wrap-max-width;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+  }
+
+  &__actionsCell {
+    white-space: nowrap;
+  }
+
+  /** Solid background + shadow on fixed-right column when table scrolls horizontally */
+  &__table {
+    :global(.ant-table-cell-fix-right) {
+      background: vars.$color-bg-surface;
+    }
+
+    :global(.ant-table-cell-fix-right-first::after) {
+      box-shadow: -6px 0 8px -4px rgb(0 0 0 / 12%);
+    }
+  }
+}

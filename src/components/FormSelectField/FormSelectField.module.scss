@@ -1,0 +1,53 @@
+@use "styles/variables" as vars;
+
+.form-select-field {
+  margin-bottom: 0 !important;
+  :global(.ant-form-item-explain-error) {
+    margin-top: vars.$form-item-error-margin-top;
+    text-align: start;
+  }
+
+  &__control {
+    width: 100%;
+
+    // Lock total control height (Ant Design padding/border otherwise grows past 42px)
+    &:global(.ant-select) {
+      height: vars.$form-control-height;
+      min-height: vars.$form-control-height;
+      line-height: 1;
+    }
+
+    &:global(.ant-select) :global(.ant-select-selector) {
+      box-sizing: border-box;
+      height: vars.$form-control-height !important;
+      min-height: vars.$form-control-height !important;
+      padding-block: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      text-align: left !important;
+    }
+
+    &:global(.ant-select) :global(.ant-select-content) {
+      text-align: left !important;
+    }
+
+    &:global(.ant-select) :global(.ant-select-selection-wrap) {
+      align-items: center;
+      min-height: 0;
+    }
+
+    &:global(.ant-select) :global(.ant-select-selection-item),
+    &:global(.ant-select) :global(.ant-select-selection-placeholder) {
+      line-height: 22px;
+    }
+
+    &:global(.ant-select) :global(.ant-select-selection-search) {
+      height: 22px;
+
+      :global(input) {
+        height: 22px;
+        line-height: 22px;
+      }
+    }
+  }
+}

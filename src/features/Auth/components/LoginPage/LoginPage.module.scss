@@ -1,0 +1,16 @@
+@use "@/styles/variables" as vars;
+
+.login-page {
+  &__card {
+    width: 100%;
+    max-width: vars.$login-card-max-width;
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__stack {
+    width: 100%;
+  }
+}

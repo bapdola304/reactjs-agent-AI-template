@@ -1,0 +1,19 @@
+@use "styles/variables" as vars;
+
+.app-button {
+  display: inline-flex;
+  min-height: vars.$form-control-height;
+  height: vars.$form-control-height;
+  align-items: center;
+  justify-content: center;
+  padding-inline: vars.$space-sm;
+  line-height: 1;
+
+  &--primary {
+    // Ant Design primary; height enforced by block
+  }
+
+  &--secondary {
+    border-color: vars.$color-border-muted;
+  }
+}
